@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import axios from 'axios';
 import './App.css';
-
 import Layout from './components/Layout';
 import Home from './pages/Home';
 import Play from './pages/Play';
@@ -16,12 +15,19 @@ function App() {
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [bookmarks, setBookmarks] = useState([]);
+  const savedBookmarks = localStorage.getItem('ltw_row_bookmarks');
+  const [bookmarks, setBookmarks] = useState(() => {
+  return savedBookmarks && savedBookmarks !== 'undefined' ? JSON.parse(savedBookmarks) : [];
+});
+  
   const [playerName, setPlayerName] = useState('');
 
   useEffect(() => {
-    const controller = new AbortController();
+    localStorage.setItem('ltw_row_bookmarks', JSON.stringify(bookmarks));
+  }, [bookmarks]);
 
+  useEffect(() => {
+    const controller = new AbortController();
     const fetchQuestions = async () => {
       try {
         setLoading(true);
@@ -42,7 +48,6 @@ function App() {
     };
 
     fetchQuestions();
-
     return () => {
       controller.abort();
     };
